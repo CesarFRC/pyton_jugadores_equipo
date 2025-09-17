@@ -1,26 +1,40 @@
-class jugador:
-    def __init__(self, nombre: str ,edad: int ,posicion: str, nacionalidad: str, numero_de_camiseta: int):
-        self.nombre = nombre
-        self.edad = edad
-        self.posicion = posicion
-        self.nacionalidad = nacionalidad
-        self.numero_de_camiseta = numero_de_camiseta  
-  
+from crud import crud
+
+class jugador(crud):
+    def __init__(self, nombre=None, edad=None, posicion=None, nacionalidad=None, numero_de_camiseta=None, es_lista=False):
+        if es_lista:
+            super().__init__()  
+        else:
+            super().__init__(nombre, edad, posicion, nacionalidad, numero_de_camiseta)
+            self.nombre = nombre
+            self.edad = edad
+            self.posicion = posicion
+            self.nacionalidad = nacionalidad
+            self.numero_de_camiseta = numero_de_camiseta
+
+    def __str__(self):
+        if self.tipo == "Objeto":
+            return f"{self.nombre} ({self.numero_de_camiseta}) - {self.posicion} - {self.nacionalidad} - {self.edad} años"
+        else:
+            return f"Arreglo de {len(self.valor)} jugadores"
+
 if __name__ == "__main__":
-    jugador1 = jugador("Lionel Messi", 36, "Delantero", "Argentino", 10)
-    jugador2 = jugador("Cristiano Ronaldo", 39, "Delantero", "Portugués", 7)
-    jugador3 = jugador("Lucas", 29, "Defensa", "Brasileño", 4)
-    jugador4 = jugador("Fernando", 21, "Mediocampista", "Mexicano", 8)
-    jugador5 = jugador("Sergio", 20, "Delantero", "Mexicano", 6)
-    
-    jugadores = [jugador1,jugador2,jugador3, jugador4, jugador5]
-  
+    jugadores = jugador(es_lista=True)  
 
+    jugadores.create(jugador("Lionel Messi", 36, "Delantero", "Argentina", 10))
+    jugadores.create(jugador("Cristiano Ronaldo", 39, "Delantero", "Portugal", 7))
+    jugadores.create(jugador("Lucas", 29, "Defensa", "Brasil", 4))
 
-    """
-    for j in jugadores:
-        print(f"{j.nombre}:({j.numero_de_camiseta}) - {j.posicion} - {j.nacionalidad} - {j.edad} años")
-    """
+    print("=== Lista inicial ===")
+    for j in jugadores.read(): 
+        print(j)
 
+    print("\n=== Actualizando el primer jugador ===")
+    jugadores.update(0, jugador("Lionel Messi", 37, "Delantero", "Argentina", 10))
+    for j in jugadores.read():
+        print(j)
 
-
+    print("\n=== Eliminando el segundo jugador ===")
+    jugadores.delete(1)
+    for j in jugadores.read():
+        print(j)
