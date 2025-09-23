@@ -1,21 +1,59 @@
+from crud import crud
 from jugadores import jugador
 from equipo import equipo
 
-class equipo_jugadores:
-    def __init__(self , equipo, jugadores):
+class equipo_jugadores(crud):
+    def __init__(self , equipo=None, jugadores=None, es_lista=False):
+        if es_lista:
+            super().__init__()  
+        else:
+            super().__init__(equipo,jugadores)  
         self.equipo = equipo
-        self.jugadores = jugadores
+        self.jugadores = jugadores if jugadores else []
+
+    def __str__(self):
+        if not self.es_lista:  
+            texto_equipo = f"Equipo: {self.equipo.nombre}, Estadio: {self.equipo.estadio}, País: {self.equipo.pais}, Año de Fundación: {self.equipo.año_fundacion}"
+            texto_jugadores = "\n".join(
+                [f"   Jugador: {j.nombre}, Edad: {j.edad}, Posición: {j.posicion}, Nacionalidad: {j.nacionalidad}, Camiseta: {j.numero_de_camiseta}" 
+                 for j in self.jugadores]
+            )
+            return texto_equipo + "\n" + texto_jugadores
+        else:
+            return f"Arreglo de {len(self.valor)} equipos con jugadores"
+
 
 if __name__ == "__main__":
-    equipo1 = equipo("Atlas", "Diego Cocca", "Estadio Jalisco", "México", 1916)
-    jugador1 = jugador("Lionel Messi", 36, "Delantero", "Argentino", 10)
-    jugador2 = jugador("Cristiano Ronaldo", 39, "Delantero", "Portugués", 7)
-    
 
-    equipo_con_jugadores = equipo_jugadores(equipo1, [jugador1, jugador2])
-    
-    """
-    print(f"Equipo: {equipo_con_jugadores.equipo.nombre}, Estadio: {equipo_con_jugadores.equipo.estadio}, País: {equipo_con_jugadores.equipo.pais}, Año de Fundación: {equipo_con_jugadores.equipo.año_fundacion}")
-    for j in equipo_con_jugadores.jugadores:
-        print(f"Jugador: {j.nombre}, Edad: {j.edad}, Posición: {j.posicion}, Nacionalidad: {j.nacionalidad}, Número de Camiseta: {j.numero_de_camiseta}")
-    """
+    jugador1 = jugador("Lionel Messi", 36, "Delantero", "Argentina", 10)
+    jugador2 = jugador("Cristiano Ronaldo", 39, "Delantero", "Portugal", 7)
+    jugador3 = jugador("Kylian Mbappé", 25, "Delantero", "Francia", 7)
+
+    equipo1 = equipo("Atlas", "Diego Cocca", "Estadio Jalisco", "México", 1916)
+    equipo2 = equipo("PSG", "Luis Enrique", "Parc des Princes", "Francia", 1970)
+
+    lista = equipo_jugadores(es_lista=True)
+
+    lista.create(equipo_jugadores(equipo1, [jugador1, jugador2]))
+    lista.create(equipo_jugadores(equipo2, [jugador3]))
+
+    print("\nLista inicial de equipos con jugadores:")
+    for ej in lista.read():
+        print(ej)
+        print("-" * 40)
+
+    print("\nActualizando PSG (agregar Neymar)...")
+    jugador4 = jugador("Neymar Jr", 32, "Delantero", "Brasil", 10)
+    equipo2_modificado = equipo("PSG", "Luis Enrique", "Parc des Princes", "Francia", 1970)
+    lista.update(1, equipo_jugadores(equipo2_modificado, [jugador3, jugador4]))
+
+    for ej in lista.read():
+        print(ej)
+        print("-" * 40)
+
+    print("\nEliminando al Atlas...")
+    lista.delete(0)
+
+    for ej in lista.read():
+        print(ej)
+        print("-" * 40)

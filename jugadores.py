@@ -13,10 +13,11 @@ class jugador(crud):
             self.numero_de_camiseta = numero_de_camiseta
 
     def __str__(self):
-        if self.tipo == "Objeto":
+        if not self.es_lista: 
             return f"{self.nombre} ({self.numero_de_camiseta}) - {self.posicion} - {self.nacionalidad} - {self.edad} años"
         else:
             return f"Arreglo de {len(self.valor)} jugadores"
+
 
 if __name__ == "__main__":
     jugadores = jugador(es_lista=True)  
@@ -25,16 +26,16 @@ if __name__ == "__main__":
     jugadores.create(jugador("Cristiano Ronaldo", 39, "Delantero", "Portugal", 7))
     jugadores.create(jugador("Lucas", 29, "Defensa", "Brasil", 4))
 
-    print("=== Lista inicial ===")
+    print("Lista inicial")
     for j in jugadores.read(): 
-        print(j)
+        print(j)  
 
-    print("\n=== Actualizando el primer jugador ===")
+    print("Actualizando el primer jugador")
     jugadores.update(0, jugador("Lionel Messi", 37, "Delantero", "Argentina", 10))
     for j in jugadores.read():
         print(j)
 
-    print("\n=== Eliminando el segundo jugador ===")
+    print("Eliminando el segundo jugador")
     jugadores.delete(1)
     for j in jugadores.read():
         print(j)
