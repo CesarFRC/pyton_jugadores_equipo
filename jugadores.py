@@ -1,11 +1,11 @@
 from crud import crud
 
 class jugador(crud):
-    def __init__(self, nombre=None, edad=None, posicion=None, nacionalidad=None, numero_de_camiseta=None, es_lista=False):
-        if es_lista:
+    def __init__(self, nombre=None, edad=None, posicion=None, nacionalidad=None, numero_de_camiseta=None):
+        self.es_lista = (nombre is None and edad is None and posicion is None and nacionalidad is None and numero_de_camiseta is None)
+        if self.es_lista:
             super().__init__()  
         else:
-            super().__init__(nombre, edad, posicion, nacionalidad, numero_de_camiseta)
             self.nombre = nombre
             self.edad = edad
             self.posicion = posicion
@@ -18,15 +18,25 @@ class jugador(crud):
         else:
             return f"Arreglo de {len(self.valor)} jugadores"
 
+    def diccionario_objeto_dict(self):
+        if not self.es_lista:
+            return {
+                "nombre": self.nombre,
+                "edad": self.edad,
+                "possicion": self.posicion,
+                "nacionalidad": self.nacionalidad,
+                "numero_de_camiseta": self.numero_de_camiseta
+            }
+
 
 if __name__ == "__main__":
-    jugadores = jugador(es_lista=True)  
+    jugadores = jugador()
 
     jugadores.create(jugador("Lionel Messi", 36, "Delantero", "Argentina", 10))
     jugadores.create(jugador("Cristiano Ronaldo", 39, "Delantero", "Portugal", 7))
     jugadores.create(jugador("Lucas", 29, "Defensa", "Brasil", 4))
 
-    print("Lista inicial")
+    print("Mostrar lista")
     for j in jugadores.read(): 
         print(j)  
 
@@ -39,3 +49,7 @@ if __name__ == "__main__":
     jugadores.delete(1)
     for j in jugadores.read():
         print(j)
+
+    print("Lista de diccionario de objetos")
+    for j in jugadores.read():
+        print(j.diccionario_objeto_dict())
