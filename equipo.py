@@ -17,6 +17,16 @@ class equipo(crud):
             return f"{self.nombre} - {self.entrenador} - {self.estadio} - {self.pais} - {self.año_fundacion}"
         else:
             return f"Arreglo de {len(self.valor)} equipos"
+        
+    def to_dict(self):
+        if not self.es_lista:
+            return {
+                "nombre": self.nombre,
+                "entrenador": self.entrenador,
+                "estadio": self.estadio,
+                "pais": self.pais,
+                "año_fundacion": self.año_fundacion
+            }
 
 if __name__ == "__main__":
     equipos = equipo()
@@ -38,3 +48,13 @@ if __name__ == "__main__":
     equipos.delete(1)
     for e in equipos.read():
         print(e)
+    
+    
+    print("Lista de diccionario de objetos equipo:")
+    for j in equipos.read():
+        print(j.to_dict())   
+
+    print("Lista de diccionarios lista de equipos:")
+    print(equipos.lista_diccionarios())  
+    
+        

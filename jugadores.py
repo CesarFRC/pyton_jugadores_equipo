@@ -18,7 +18,7 @@ class jugador(crud):
         else:
             return f"Arreglo de {len(self.valor)} jugadores"
 
-    def diccionario_objeto_dict(self):
+    def to_dict(self):
         if not self.es_lista:
             return {
                 "nombre": self.nombre,
@@ -50,6 +50,9 @@ if __name__ == "__main__":
     for j in jugadores.read():
         print(j)
 
-    print("Lista de diccionario de objetos")
+    print("Lista de diccionario de objetos jugador:")
     for j in jugadores.read():
-        print(j.diccionario_objeto_dict())
+        print(j.to_dict())   
+
+    print("Lista de diccionarios lista jugadores:")
+    print(jugadores.lista_diccionarios())  
