@@ -27,6 +27,8 @@ class equipo(crud):
                 "pais": self.pais,
                 "año_fundacion": self.año_fundacion
             }
+        else:
+            return [equipo.to_dict() for equipo in self.valor]
 
 if __name__ == "__main__":
     equipos = equipo()
@@ -54,6 +56,6 @@ if __name__ == "__main__":
     print(equipos.read()[0].to_dict())
 
     print("Lista de diccionarios lista de equipos:")
-    print(equipos.lista_diccionarios())  
+    print(equipos.to_dict())  
     
         

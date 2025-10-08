@@ -56,4 +56,4 @@ if __name__ == "__main__":
     print(jugadores.read()[0].to_dict())
 
     print("Lista de diccionarios lista jugadores:")
-    print(jugadores.lista_diccionarios())  
+    print(jugadores.to_dict())  

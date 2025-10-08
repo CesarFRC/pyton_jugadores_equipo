@@ -22,3 +22,4 @@ class crud:
             
     def to_dict(self):
         return [item.to_dict() for item in self.valor]
+    
