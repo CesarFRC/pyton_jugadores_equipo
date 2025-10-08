@@ -25,10 +25,13 @@ class equipo_jugadores(crud):
             return f"Arreglo de {len(self.valor)} equipos con jugadores"
 
     def to_dict(self):
+        if not self.es_lista:
             return {
             "equipo": self.equipo.to_dict(),
-            "jugadores": self.jugadores.lista_diccionarios()
+            "jugadores": self.jugadores.to_dict()
         }
+        else:
+            return super().to_dict()
 
 if __name__ == "__main__":
     jugador1 = jugador("Lionel Messi", 36, "Delantero", "Argentina", 10)
@@ -50,7 +53,7 @@ if __name__ == "__main__":
     lista_equipos = equipo_jugadores()
     lista_equipos.create(eq1)
     lista_equipos.create(eq1)
-    print(lista_equipos.lista_diccionarios())
+    print(lista_equipos.to_dict())
  
 # print("Mostrar Lista ")
 # for ej in lista.read():

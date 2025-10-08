@@ -23,10 +23,12 @@ class jugador(crud):
             return {
                 "nombre": self.nombre,
                 "edad": self.edad,
-                "possicion": self.posicion,
+                "posicion": self.posicion,
                 "nacionalidad": self.nacionalidad,
                 "numero_de_camiseta": self.numero_de_camiseta
             }
+        else:
+            return [j.to_dict() for j in self.valor]
 
 
 if __name__ == "__main__":

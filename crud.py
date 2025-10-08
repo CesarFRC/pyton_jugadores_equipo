@@ -20,5 +20,5 @@ class crud:
         else:
             print("Índice fuera de rango")
             
-    def lista_diccionarios(self):
+    def to_dict(self):
         return [item.to_dict() for item in self.valor]
