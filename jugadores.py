@@ -50,9 +50,8 @@ if __name__ == "__main__":
     for j in jugadores.read():
         print(j)
 
-    print("Lista de diccionario de objetos jugador:")
-    for j in jugadores.read():
-        print(j.to_dict())   
+    print("Lista de diccionario de objeto jugador:")
+    print(jugadores.read()[0].to_dict())
 
     print("Lista de diccionarios lista jugadores:")
     print(jugadores.lista_diccionarios())  

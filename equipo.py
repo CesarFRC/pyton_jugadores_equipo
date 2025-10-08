@@ -50,9 +50,8 @@ if __name__ == "__main__":
         print(e)
     
     
-    print("Lista de diccionario de objetos equipo:")
-    for j in equipos.read():
-        print(j.to_dict())   
+    print("Lista de diccionario de objeto equipo:")
+    print(equipos.read()[0].to_dict())
 
     print("Lista de diccionarios lista de equipos:")
     print(equipos.lista_diccionarios())  
