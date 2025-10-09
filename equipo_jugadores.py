@@ -1,6 +1,8 @@
 from crud import crud
 from jugadores import jugador
 from equipo import equipo
+import json
+
 
 class equipo_jugadores(crud):
     def __init__(self , equipo=None, jugadores=None):        
@@ -32,6 +34,19 @@ class equipo_jugadores(crud):
         }
         else:
             return super().to_dict()
+        
+        
+    def guardar_json(self, nombre_archivo):
+        """Guarda un objeto o lista de equipos con jugadores en JSON."""
+        try:
+            with open(nombre_archivo, "w", encoding="utf-8") as f:
+                json.dump(self.to_dict(), f, ensure_ascii=False, indent=4)
+            if self.es_lista:
+                print(f"Lista de equipos con jugadores guardada en '{nombre_archivo}'")
+            else:
+                print(f"Equipo con jugadores guardado en '{nombre_archivo}'")
+        except Exception as e:
+            print(f"Error al guardar JSON: {e}")
 
 if __name__ == "__main__":
     jugador1 = jugador("Lionel Messi", 36, "Delantero", "Argentina", 10)
@@ -54,6 +69,15 @@ if __name__ == "__main__":
     lista_equipos.create(eq1)
     lista_equipos.create(eq1)
     print(lista_equipos.to_dict())
+    
+    
+    eq1 = equipo_jugadores(equipo1,[jugador1,jugador2])
+    eq1.guardar_json("equipo1.json")
+    
+    lista_equipos = equipo_jugadores()
+    lista_equipos.create(eq1)
+    lista_equipos.create(equipo_jugadores(equipo1,[jugador1,jugador2]))
+    lista_equipos.guardar_json("equipos_completos.json")
  
 # print("Mostrar Lista ")
 # for ej in lista.read():
