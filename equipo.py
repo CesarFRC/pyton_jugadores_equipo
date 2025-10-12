@@ -33,18 +33,11 @@ class equipo(crud):
             return [equipo.to_dict() for equipo in self.valor]
         
         
+    
+
         
-    def guardar_json(self, nombre_archivo):
-        try:
-            with open(nombre_archivo, "w", encoding="utf-8") as f:
-                if self.es_lista:
-                    json.dump(self.to_dict(), f, ensure_ascii=False, indent=4)
-                    print(f"Lista de equipos guardada en '{nombre_archivo}'")
-                else:
-                    json.dump(self.to_dict(), f, ensure_ascii=False, indent=4)
-                    print(f"Equipo guardado en '{nombre_archivo}'")
-        except Exception as e:
-            print(f"Error al guardar JSON: {e}")
+        
+    
 
 if __name__ == "__main__":
     equipos = equipo()
@@ -80,7 +73,10 @@ if __name__ == "__main__":
     
     equipos.guardar_json("equipos.json")
     
-    atlas = equipo("Atlas", "Benjamin Mora", "Estadio Jalisco", "México", 1916)
-    atlas.guardar_json("atlas.json")  
+   
+    
+    converted_json = equipo.lectura_json("equipos.json")
+    
+    converted_json.guardar_json("equipos_copia.json")
     
         

@@ -30,20 +30,11 @@ class jugador(crud):
             }
         else:
             return [j.to_dict() for j in self.valor]
+    
+    
         
-        
-    def guardar_json(self, nombre_archivo):
-        if not self.es_lista:
-            try:
-                with open(nombre_archivo,"w", encoding="utf-8") as f:
-                    json.dump(self.to_dict(), f, ensure_ascii= False,indent=4)
-                print(f"Jugador guardado en '{nombre_archivo}'")
-            except Exception as e:
-                print(f"Error al guardar jugador: {e}")
-        else:
-            super().guardar_json(nombre_archivo)
-            
-   
+    
+
 
 if __name__ == "__main__":
     jugadores = jugador()
@@ -74,6 +65,9 @@ if __name__ == "__main__":
     
     
     jugadores.guardar_json("jugadores.json")
+
+    converted_json = jugador.lectura_json("jugadores.json")
+
     
-    kim = jugador("Kim", 40, "Defensa", "Peru", 12)
-    kim.guardar_json("kim.json")
+    
+    converted_json.guardar_json("jugadores_copia.json")
