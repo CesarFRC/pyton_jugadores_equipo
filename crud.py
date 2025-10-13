@@ -39,53 +39,36 @@ class crud:
             print(f"Error al guardar JSON: {e}")
             
     
-    
     @classmethod
     def lectura_json(cls, archivo):
-        """Lee un JSON (lista u objeto) y crea instancias, incluso con objetos anidados."""
         try:
             with open(archivo, "r", encoding="utf-8") as f:
                 datos = json.load(f)
 
             def crear_instancia(dic, clase):
-                """Convierte un diccionario en una instancia, detectando subclases anidadas."""
                 if not isinstance(dic, dict):
-                    return dic 
-                
+                    return dic
+
                 params = inspect.signature(clase.__init__).parameters
                 kwargs = {}
 
                 for key, value in dic.items():
                     if key in params:
-                        
-                        if isinstance(value, dict):
-                            nombre_clase = key.lower()
-                            subclase = globals().get(nombre_clase)
-                            
-                            if subclase and issubclass(subclase, cls):
-                                kwargs[key] = crear_instancia(value, subclase)
-                            else:
-                                kwargs[key] = value
-                        
-                        elif isinstance(value, list):
-                            
-                            nombre_clase_singular = key[:-1].lower() 
-                            subclase = globals().get(nombre_clase_singular) 
+                        if isinstance(value, dict) and key.lower() == "equipo":
+                            from equipo import equipo
+                            kwargs[key] = crear_instancia(value, equipo)
 
-                            if subclase and issubclass(subclase, cls):
-                               
-                                kwargs[key] = [crear_instancia(v, subclase) for v in value]
-                            else:
-                                kwargs[key] = value
-                                
+                        elif isinstance(value, list) and key.lower() == "jugadores":
+                            from jugadores import jugador
+                            kwargs[key] = [crear_instancia(v, jugador) for v in value]
+
                         else:
                             kwargs[key] = value
-                
+
                 return clase(**kwargs)
 
-            
             if isinstance(datos, list):
-                lista = cls()
+                lista = cls()  
                 for item_data in datos:
                     lista.create(crear_instancia(item_data, cls))
                 return lista
@@ -94,7 +77,7 @@ class crud:
                 return crear_instancia(datos, cls)
 
             else:
-                raise ValueError("El JSON no es lista ni diccionario")
+                raise ValueError("JSON inválido: no es lista ni diccionario")
 
         except Exception as e:
             print(f"Error al leer JSON en {cls.__name__}: {e}")
