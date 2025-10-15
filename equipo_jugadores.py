@@ -77,8 +77,7 @@ if __name__ == "__main__":
     lista_equipos.create(equipo_jugadores(equipo1,[jugador1,jugador2]))
     lista_equipos.guardar_json("equipos_completos.json")
 
-    lista_leida = equipo_jugadores.lectura_json("equipos_completos.json")
-    lista_leida.guardar_json("equipos_completos_copia.json")
+   
 # print("Mostrar Lista ")
 # for ej in lista.read():
 #     print(ej)

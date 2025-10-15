@@ -35,7 +35,33 @@ class equipo(crud):
         
     
 
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            nombre=data.get("nombre"),
+            entrenador=data.get("entrenador"),
+            estadio=data.get("estadio"),
+            pais=data.get("pais"),
+            año_fundacion=data.get("año_fundacions")
+        )
         
+    @classmethod
+    def lectura_json(cls, nombre_archivo):
+        try:
+            with open(nombre_archivo, "r", encoding="utf-8") as f:
+                datos = json.load(f)
+            if isinstance(datos,list):
+                lista = cls()
+                for d in datos:
+                    lista.create(cls.from_dict(d))
+                print(f"Json leido y convertido desde el archivo")
+                return lista
+            else:
+                return cls.from_dict(datos)
+        except Exception as e:
+            print(f"Error al leer JSON: {e}")
+            return cls()
+
         
     
 
@@ -73,10 +99,8 @@ if __name__ == "__main__":
     
     equipos.guardar_json("equipos.json")
     
-   
+    nuevos_equipos = equipo.lectura_json("equipos.json")
     
-    converted_json = equipo.lectura_json("equipos.json")
-    
-    converted_json.guardar_json("equipos_copia.json")
+    nuevos_equipos.guardar_json("equipos_copia.json")
     
         

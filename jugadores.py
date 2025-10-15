@@ -1,5 +1,6 @@
 from crud import crud
 import json
+import inspect
 
 class jugador(crud):
     def __init__(self, nombre=None, edad=None, posicion=None, nacionalidad=None, numero_de_camiseta=None):
@@ -31,9 +32,32 @@ class jugador(crud):
         else:
             return [j.to_dict() for j in self.valor]
     
-    
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            nombre=data.get("nombre"),
+            edad=data.get("edad"),
+            posicion=data.get("posicion"),
+            nacionalidad=data.get("nacionalidad"),
+            numero_de_camiseta=data.get("numero_de_camiseta")
+        )
         
-    
+    @classmethod
+    def lectura_json(cls, nombre_archivo):
+        try:
+            with open(nombre_archivo, "r", encoding="utf-8") as f:
+                datos = json.load(f)
+            if isinstance(datos,list):
+                lista = cls()
+                for d in datos:
+                    lista.create(cls.from_dict(d))
+                print(f"Json leido y convertido desde el archivo")
+                return lista
+            else:
+                return cls.from_dict(datos)
+        except Exception as e:
+            print(f"Error al leer JSON: {e}")
+            return cls()
 
 
 if __name__ == "__main__":
@@ -65,9 +89,7 @@ if __name__ == "__main__":
     
     
     jugadores.guardar_json("jugadores.json")
-
-    converted_json = jugador.lectura_json("jugadores.json")
-
     
-    
-    converted_json.guardar_json("jugadores_copia.json")
+    nuevos_jugadores = jugador.lectura_json("jugadores.json")
+
+    nuevos_jugadores.guardar_json("jugadores_copia.json")
