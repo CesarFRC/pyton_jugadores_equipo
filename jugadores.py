@@ -42,22 +42,16 @@ class jugador(crud):
             numero_de_camiseta=data.get("numero_de_camiseta")
         )
         
-    @classmethod
-    def lectura_json(cls, nombre_archivo):
-        try:
-            with open(nombre_archivo, "r", encoding="utf-8") as f:
-                datos = json.load(f)
-            if isinstance(datos,list):
-                lista = cls()
-                for d in datos:
-                    lista.create(cls.from_dict(d))
-                print(f"Json leido y convertido desde el archivo")
-                return lista
-            else:
-                return cls.from_dict(datos)
-        except Exception as e:
-            print(f"Error al leer JSON: {e}")
-            return cls()
+    def convertir_a_objeto(self, data):
+        if isinstance(data, list):
+            lista = jugador()
+            for d in data:
+                lista.create(jugador.from_dict(d))
+            return lista
+        elif isinstance(data, dict):
+            return jugador.from_dict(data)
+        else:
+            return jugador()
 
 
 if __name__ == "__main__":
@@ -88,8 +82,13 @@ if __name__ == "__main__":
     print(jugadores.to_dict())  
     
     
+    
     jugadores.guardar_json("jugadores.json")
     
-    nuevos_jugadores = jugador.lectura_json("jugadores.json")
-
+    datos = jugadores.lectura_json("jugadores.json")
+    
+    nuevos_jugadores = jugador().convertir_a_objeto(datos)
+    
     nuevos_jugadores.guardar_json("jugadores_copia.json")
+
+   

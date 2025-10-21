@@ -35,44 +35,33 @@ class equipo_jugadores(crud):
         else:
             return super().to_dict()
         
+        
     @classmethod
-    def lectura_json(cls, nombre_archivo):
-        """Lee un archivo JSON y devuelve un objeto lista de equipos con jugadores"""
-        try:
-            with open(nombre_archivo, "r", encoding="utf-8") as f:
-                datos = json.load(f)
-
-            if isinstance(datos, list):
-                lista = cls()
-                for d in datos:
-                    eq_data = d["equipo"]
-                    jug_data = d["jugadores"]
-
-                    eq_obj = equipo(
-                        eq_data["nombre"],
-                        eq_data["entrenador"],
-                        eq_data["estadio"],
-                        eq_data["pais"],
-                        eq_data["año_fundacion"]
-                    )
-
-                    jugadores_obj = [jugador.from_dict(j) for j in jug_data]
-                    lista.create(cls(eq_obj, jugadores_obj))
-
-                print("JSON leído correctamente")
-                return lista
-            else:
-                print("El archivo no contiene una lista de equipos")
-                return cls()
-
-        except FileNotFoundError:
-            print(f"El archivo '{nombre_archivo}' no existe.")
-            return cls()
-        except Exception as e:
-            print(f"Error al leer JSON: {e}")
-            return cls() 
-            
+    def from_dict(cls,data):
+        eq_data = data.get("equipo",{})
+        equipo_obj = equipo.from_dict(eq_data)
+        
+        jug_data_list = data.get("jugadores", [])
+        
+        jugadores_obj_list = [jugador.from_dict(j_dict) for j_dict in jug_data_list]
+        
+        return cls(equipo_obj, jugadores_obj_list)
     
+    
+    def convertir_a_objeto(self, data):
+        if isinstance(data, list):
+            lista = equipo_jugadores()
+            for d in data:
+                lista.create(equipo_jugadores.from_dict(d))
+            return lista
+        elif isinstance(data,dict):
+            return equipo_jugadores.from_dict(data)
+        else:
+            return equipo_jugadores()
+        
+        
+    
+
 
 if __name__ == "__main__":
     jugador1 = jugador("Lionel Messi", 36, "Delantero", "Argentina", 10)
@@ -102,8 +91,15 @@ if __name__ == "__main__":
     lista_equipos.create(eq1)
     lista_equipos.create(equipo_jugadores(equipo1,[jugador1,jugador2]))
     lista_equipos.guardar_json("equipos_completos.json")
-    lista_leida = equipo_jugadores.lectura_json("equipos_completos.json")
-    lista_leida.guardar_json("equipos_completos_coopia.json")
+    
+    datos = lista_equipos.lectura_json("equipos_completos.json")
+    nuevos_equipos = equipo_jugadores().convertir_a_objeto(datos)
+    
+    nuevos_equipos.guardar_json("equipos_copia.json")
+    
+
+    #lista_leida = equipo_jugadores.lectura_json("equipos_completos.json")
+    #lista_leida.guardar_json("equipos_completos_coopia.json")
 # print("Mostrar Lista ")
 # for ej in lista.read():
 #     print(ej)

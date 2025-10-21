@@ -32,8 +32,31 @@ class equipo(crud):
         else:
             return [equipo.to_dict() for equipo in self.valor]
         
+    @classmethod
+    def from_dict(cls,data):
+        return cls(
+            nombre=data.get("nombre"),
+            entrenador=data.get("entrenador"),
+            estadio=data.get("estadio"),
+            pais=data.get("pais"),
+            año_fundacion=data.get("año_fundacion")
+        )
         
-    
+    def convertir_a_objeto(self,data):
+        if isinstance(data,list):
+            lista = equipo()
+            for d in data:
+                lista.create(equipo.from_dict(d))
+            return lista
+        elif isinstance(data,dict):
+            return equipo.from_dict(data)
+        else:
+            return equipo()
+            
+        
+        
+        """""""""
+
 
     @classmethod
     def from_dict(cls, data):
@@ -62,7 +85,8 @@ class equipo(crud):
             print(f"Error al leer JSON: {e}")
             return cls()
 
-        
+            """""""""
+
     
 
 if __name__ == "__main__":
@@ -99,8 +123,15 @@ if __name__ == "__main__":
     
     equipos.guardar_json("equipos.json")
     
-    nuevos_equipos = equipo.lectura_json("equipos.json")
+    datos = equipos.lectura_json("equipos.json")
+    
+    nuevos_equipos = equipo().convertir_a_objeto(datos)
     
     nuevos_equipos.guardar_json("equipos_copia.json")
+
+
+  
+    #nuevos_equipos = equipo.lectura_json("equipos.json")
+    #nuevos_equipos.guardar_json("equipos_copia.json")
     
         
