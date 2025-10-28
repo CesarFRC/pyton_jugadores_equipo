@@ -1,5 +1,4 @@
 from equipo import equipo
-import json
 
 
 class EquipoMenu:
