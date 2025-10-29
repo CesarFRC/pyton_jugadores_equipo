@@ -28,10 +28,9 @@ class EquipoJugadoresMenu:
         """Asegura que los datos de jugadores sean siempre una lista."""
         if jugadores_data is None:
             return []
-        # Asumiendo que si no es lista, es el objeto 'jugador' singular
         if not isinstance(jugadores_data, list):
             return [jugadores_data]
-        return jugadores_data[:] # Retorna una copia si ya es una lista
+        return jugadores_data[:] 
 
     def mostrar_menu(self):
         print("\n=== SISTEMA DE GESTIÓN DE EQUIPOS CON JUGADORES ===")
@@ -121,10 +120,8 @@ class EquipoJugadoresMenu:
                 print("Actualizacion cancelada. ")
                 return
             
-            # --- CORRECCIÓN CLAVE ---
             jugadores_raw = getattr(equipo_item, "jugadores", None)
             jugadores_actuales = self._normalizar_jugadores(jugadores_raw)
-            # ------------------------
             
             nuevo_item = equipo_jugadores(nuevo_eq, jugadores_actuales)
             self.lista.update(idx_equipo, nuevo_item)
@@ -132,14 +129,13 @@ class EquipoJugadoresMenu:
             
         elif opcion == "2":
             jugadores_raw = getattr(equipo_item, "jugadores", None)
-            jugadores_list = self._normalizar_jugadores(jugadores_raw) # Aplicando normalización
+            jugadores_list = self._normalizar_jugadores(jugadores_raw) 
             
             if not jugadores_list:
                 print("El equipo no tiene jugadores para actualizar. ")
                 return
             print("\nJugadores del equipo: ")
             
-            # Ahora jugadores_list es una lista y se puede iterar
             for i, j in enumerate(jugadores_list):
                 print(f"{i}. {j}")
             try:
@@ -156,7 +152,7 @@ class EquipoJugadoresMenu:
                 print("Actualizacion de jugador cancelada. ")
                 return
             
-            nuevos = jugadores_list[:] # Copia de la lista normalizada
+            nuevos = jugadores_list[:] 
             nuevos[idx_j] = nuevo_j
             nuevo_item = equipo_jugadores(getattr(equipo_item, "equipo", None), nuevos)
             self.lista.update(idx_equipo,nuevo_item)
