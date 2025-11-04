@@ -1,19 +1,19 @@
 from jugadores import jugador
-import json
 
 
 class JugadoresMenu:
     
     def __init__(self, jugadores_iniciales=None):
-        self.archivo = "jugadores.json"
         
         if jugadores_iniciales is not None:
             self.jugadores = jugadores_iniciales
+            self.debe_guardar = False
+            self.archivo = None
         else:
-
+            self.archivo = "jugadores.json"
             self.jugadores = jugador()
-            
             datos = self.jugadores.lectura_json(self.archivo)
+            self.debe_guardar = True
             
             if datos:
                 self.jugadores = jugador().convertir_a_objeto(datos)
@@ -41,6 +41,9 @@ class JugadoresMenu:
             return None
 
     def agregar(self):
+        if not self.debe_guardar:
+            print("No puedes agregar jugadores")
+            return
         print("\n-- AGREGAR JUGADOR --")
         nuevo = self.pedir_datos_jugador()
         if nuevo:
@@ -57,6 +60,9 @@ class JugadoresMenu:
             print(f"{i}. {j}")
 
     def actualizar(self):
+        if not self.debe_guardar:
+            print("No puedes actualizar jugadores")
+            return
         if getattr(self.jugadores, "es_lista", True) and not self.jugadores.read():
             print("\nNo hay jugadores para actualizar")
             return
@@ -74,6 +80,9 @@ class JugadoresMenu:
             print("Error: Índice inválido")
 
     def eliminar(self):
+        if not self.debe_guardar:
+            print("No puedes eliminar jugadores")
+            return
         if getattr(self.jugadores, "es_lista", True) and not self.jugadores.read():
             print("\nNo hay jugadores para eliminar")
             return

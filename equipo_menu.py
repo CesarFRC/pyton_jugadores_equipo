@@ -3,12 +3,15 @@ from equipo import equipo
 
 class EquipoMenu:
     def __init__(self, equipos_iniciales=None):
-        self.archivo = "equipos.json"
         if equipos_iniciales is not None:
             self.equipos = equipos_iniciales
+            self.debe_guardar = False
+            self.archivo = None
         else:
+            self.archivo = "equipos.json"
             self.equipos = equipo()
             datos = self.equipos.lectura_json(self.archivo)
+            self.debe_guardar = True
             if datos:
                 self.equipos = equipo().convertir_a_objeto(datos)
 
@@ -34,6 +37,9 @@ class EquipoMenu:
             return None
 
     def agregar(self):
+        if not self.debe_guardar:
+            print("No debe agregar equipos  ")
+            return
         print("\n-- AGREGAR EQUIPO --")
         nuevo = self.pedir_datos_equipo()
         if nuevo:
@@ -50,6 +56,9 @@ class EquipoMenu:
             print(f"{i}. {e}")
 
     def actualizar(self):
+        if not self.debe_guardar:
+            print("No debe actuazlizar equipo")
+            return
         if getattr(self.equipos, "es_lista", True) and not self.equipos.read():
             print("\nNo hay equipos para actualizar")
             return
@@ -67,6 +76,9 @@ class EquipoMenu:
             print("Error: Índice inválido")
 
     def eliminar(self):
+        if not self.debe_guardar:
+            print("No debe eliminar equipos")
+            return
         if getattr(self.equipos, "es_lista", True) and not self.equipos.read():
             print("\nNo hay equipos para eliminar")
             return
