@@ -37,13 +37,13 @@ class EquipoMenu:
             return None
 
     def agregar(self):
-        if not self.debe_guardar:
-            print("No debe agregar equipos  ")
-            return
         print("\n-- AGREGAR EQUIPO --")
         nuevo = self.pedir_datos_equipo()
         if nuevo:
             self.equipos.create(nuevo)
+            if not self.debe_guardar:
+                print("No se guardara lo agregado  ")
+                return
             self.equipos.guardar_json(self.archivo)
             print("Equipo agregado y guardado")
 
@@ -56,9 +56,6 @@ class EquipoMenu:
             print(f"{i}. {e}")
 
     def actualizar(self):
-        if not self.debe_guardar:
-            print("No debe actuazlizar equipo")
-            return
         if getattr(self.equipos, "es_lista", True) and not self.equipos.read():
             print("\nNo hay equipos para actualizar")
             return
@@ -70,15 +67,15 @@ class EquipoMenu:
             nuevo = self.pedir_datos_equipo()
             if nuevo:
                 self.equipos.update(indice, nuevo)
+                if not self.debe_guardar:
+                    print("No guardara los equipos")
+                    return
                 self.equipos.guardar_json(self.archivo)
                 print("Equipo actualizado y guardado")
         except ValueError:
             print("Error: Índice inválido")
 
     def eliminar(self):
-        if not self.debe_guardar:
-            print("No debe eliminar equipos")
-            return
         if getattr(self.equipos, "es_lista", True) and not self.equipos.read():
             print("\nNo hay equipos para eliminar")
             return
@@ -88,6 +85,9 @@ class EquipoMenu:
         try:
             indice = int(input("\nÍndice del equipo a eliminar: "))
             self.equipos.delete(indice)
+            if not self.debe_guardar:
+                print("No Guardara cambios")
+                return
             self.equipos.guardar_json(self.archivo)
             print("Equipo eliminado y guardado")
         except ValueError:

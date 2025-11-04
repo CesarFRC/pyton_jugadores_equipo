@@ -14,7 +14,6 @@ class JugadoresMenu:
             self.jugadores = jugador()
             datos = self.jugadores.lectura_json(self.archivo)
             self.debe_guardar = True
-            
             if datos:
                 self.jugadores = jugador().convertir_a_objeto(datos)
 
@@ -41,13 +40,13 @@ class JugadoresMenu:
             return None
 
     def agregar(self):
-        if not self.debe_guardar:
-            print("No puedes agregar jugadores")
-            return
         print("\n-- AGREGAR JUGADOR --")
         nuevo = self.pedir_datos_jugador()
         if nuevo:
             self.jugadores.create(nuevo)
+            if not self.debe_guardar:
+                print("No se guardara lo agregado")
+                return
             self.jugadores.guardar_json(self.archivo)
             print("Jugador agregado exitosamente y guardado")
 
@@ -60,9 +59,6 @@ class JugadoresMenu:
             print(f"{i}. {j}")
 
     def actualizar(self):
-        if not self.debe_guardar:
-            print("No puedes actualizar jugadores")
-            return
         if getattr(self.jugadores, "es_lista", True) and not self.jugadores.read():
             print("\nNo hay jugadores para actualizar")
             return
@@ -74,15 +70,15 @@ class JugadoresMenu:
             nuevo = self.pedir_datos_jugador()
             if nuevo:
                 self.jugadores.update(indice, nuevo)
+                if not self.debe_guardar:
+                    print("No se guardara lo actualizado")
+                    return
                 self.jugadores.guardar_json(self.archivo)
                 print("Jugador actualizado exitosamente")
         except ValueError:
             print("Error: Índice inválido")
 
     def eliminar(self):
-        if not self.debe_guardar:
-            print("No puedes eliminar jugadores")
-            return
         if getattr(self.jugadores, "es_lista", True) and not self.jugadores.read():
             print("\nNo hay jugadores para eliminar")
             return
@@ -92,6 +88,9 @@ class JugadoresMenu:
         try:
             indice = int(input("\nÍndice del jugador a eliminar: "))
             self.jugadores.delete(indice)
+            if not self.debe_guardar:
+                print("No se guardara ")
+                return
             self.jugadores.guardar_json(self.archivo)
             print("Jugador eliminado exitosamente")
         except ValueError:
