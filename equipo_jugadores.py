@@ -1,7 +1,6 @@
 from crud import crud
 from jugadores import jugador
 from equipo import equipo
-import json
 
 
 class equipo_jugadores(crud):
