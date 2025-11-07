@@ -5,10 +5,8 @@ from jugadores_menu import JugadoresMenu
 class EquipoJugadoresMenu:
 
     def __init__(self, equipos_iniciales=None):
-
-        self.equipos_menu = EquipoMenu()
         self.jugadores_menu = JugadoresMenu()
-
+        self.equipos_menu = EquipoMenu()
         if equipos_iniciales is not None:
             self.lista = equipos_iniciales
             self.debe_guardar = False
@@ -47,7 +45,7 @@ class EquipoJugadoresMenu:
                 nuevos_equipos_agregados.append(equipo_simple.nombre)
 
         if nuevos_equipos_agregados:
-            print(f"¡Equipos sincronizados! Listos para asignar jugadores: {', '.join(nuevos_equipos_agregados)}")
+            print(f"Equipos sincronizados Listos para asignar jugadores: {', '.join(nuevos_equipos_agregados)}")
             if self.debe_guardar:
                 self.lista.guardar_json(self.archivo)
                 
@@ -57,21 +55,13 @@ class EquipoJugadoresMenu:
 
         jugadores_disponibles = self.jugadores_menu.jugadores.read()
         equipos_completos = self.lista.read() 
-
-        if not jugadores_disponibles:
-            print("No hay jugadores disponibles. Use la Opción 2 para agregarlos.")
-            return
-
-        if not equipos_completos:
-            print("No hay equipos registrados. Use la Opción 3 para agregarlos y sincronizar.")
-            return
-
+        
         print("\nJugadores (a asignar):")
         for i, j in enumerate(jugadores_disponibles):
             print(f"{i}. {j.nombre}")
 
         try:
-            idx_jugador = int(input("Seleccione el **número** del jugador: "))
+            idx_jugador = int(input("Seleccione el número del jugador: "))
             jugador_obj = jugadores_disponibles[idx_jugador]
         except (ValueError, IndexError):
             print("Error: Índice de jugador inválido.")
@@ -82,7 +72,7 @@ class EquipoJugadoresMenu:
             print(f"{i}. {ej.equipo.nombre}") 
 
         try:
-            idx_equipo = int(input("Seleccione el **número** del equipo: "))
+            idx_equipo = int(input("Seleccione el número del equipo: "))
             equipo_jugadores_obj = equipos_completos[idx_equipo]
         except (ValueError, IndexError):
             print("Error: Índice de equipo inválido.")
@@ -122,7 +112,7 @@ class EquipoJugadoresMenu:
                 self.equipos_menu.run()   
                 self.recargar_equipos()
             elif opcion == "0":
-                print("\nAdiós. Aplicación terminada.")
+                print("\nAplicación terminada.")
                 break
             else:
                 print("Opción no válida")
