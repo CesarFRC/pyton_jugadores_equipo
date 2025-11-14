@@ -28,6 +28,8 @@ class crud:
     def to_dict(self):
         return [item.to_dict() for item in self.valor]
     
+    def __iter__(self):
+        return iter(self.valor)
 
     def guardar_json(self, nombre_archivo):
         try:

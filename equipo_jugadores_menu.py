@@ -43,7 +43,7 @@ class EquipoJugadoresMenu:
         nuevo_equipo = equipo_menu_temp.pedir_datos_equipo()
         jugadores_menu_temp = JugadoresMenu(jugador()) 
         jugadores_menu_temp.run()      
-        jugadores_list = jugadores_menu_temp.jugadores.read()
+        jugadores_list = jugadores_menu_temp.jugadores
         nueva_entidad = equipo_jugadores(nuevo_equipo, jugadores_list)
         self.lista.create(nueva_entidad)
         if self.debe_guardar and self.archivo:
@@ -75,7 +75,7 @@ class EquipoJugadoresMenu:
         equipo_modificado = equipo_menu_temp.equipos.read()[0] 
         jugadores_menu_temp = JugadoresMenu(entidad_a_modificar.jugadores)
         jugadores_menu_temp.run()
-        jugadores_modificados_list = entidad_a_modificar.jugadores.read()
+        jugadores_modificados_list = entidad_a_modificar.jugadores
         nueva_entidad = equipo_jugadores(equipo_modificado, jugadores_modificados_list)
         self.lista.update(indice, nueva_entidad)
         if self.debe_guardar and self.archivo:
