@@ -67,24 +67,17 @@ class EquipoJugadoresMenu:
         print("\n-- ACTUALIZAR EQUIPO COMPLETO --")
         
         indice = int(input("Índice del equipo completo a actualizar: "))
-        
         entidad_a_modificar = equipos[indice]
-        
         equipo_crud = equipo()
         equipo_crud.create(entidad_a_modificar.equipo)
-        
         equipo_menu_temp = EquipoMenu(equipo_crud)
         equipo_menu_temp.run() 
         equipo_modificado = equipo_menu_temp.equipos.read()[0] 
-        
         jugadores_menu_temp = JugadoresMenu(entidad_a_modificar.jugadores)
         jugadores_menu_temp.run()
         jugadores_modificados_list = entidad_a_modificar.jugadores.read()
-        
         nueva_entidad = equipo_jugadores(equipo_modificado, jugadores_modificados_list)
-        
         self.lista.update(indice, nueva_entidad)
-        
         if self.debe_guardar and self.archivo:
             self.lista.guardar_json(self.archivo)
             print("Equipo Completo actualizado y guardado.")
