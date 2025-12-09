@@ -1,14 +1,16 @@
 from jugadores import jugador
-
+from sicronizador import iniciar_sincronizador
 
 class JugadoresMenu:
     
+   
     def __init__(self, jugadores_iniciales=None):
         
         if jugadores_iniciales is not None:
             self.jugadores = jugadores_iniciales
             self.debe_guardar = False
             self.archivo = None
+            
         else:
             self.archivo = "jugadores.json"
             self.jugadores = jugador()
@@ -16,6 +18,9 @@ class JugadoresMenu:
             self.debe_guardar = True
             if datos:
                 self.jugadores = jugador().convertir_a_objeto(datos)
+                
+    
+
 
             
     def mostrar_menu(self):
@@ -96,6 +101,7 @@ class JugadoresMenu:
         except ValueError:
             print("Error: Índice inválido")
 
+    
     def run(self):
         while True:
             opcion = self.mostrar_menu()
@@ -115,5 +121,6 @@ class JugadoresMenu:
 
 
 if __name__ == "__main__":
+    iniciar_sincronizador()
     menu = JugadoresMenu() 
     menu.run()

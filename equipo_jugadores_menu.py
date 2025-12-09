@@ -3,6 +3,7 @@ from equipo_menu import EquipoMenu
 from jugadores_menu import JugadoresMenu
 from jugadores import jugador 
 from equipo import equipo
+from sicronizador import iniciar_sincronizador
 
 class EquipoJugadoresMenu:
 
@@ -116,5 +117,6 @@ class EquipoJugadoresMenu:
 
 
 if __name__ == "__main__":
+    iniciar_sincronizador()
     menu = EquipoJugadoresMenu()
     menu.run()

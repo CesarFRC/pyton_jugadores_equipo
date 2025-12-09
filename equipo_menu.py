@@ -1,4 +1,5 @@
 from equipo import equipo
+from sicronizador import iniciar_sincronizador
 
 
 class EquipoMenu:
@@ -112,5 +113,6 @@ class EquipoMenu:
 
 
 if __name__ == "__main__":
+    iniciar_sincronizador()
     menu = EquipoMenu()
     menu.run()
