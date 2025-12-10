@@ -2,7 +2,6 @@ import json
 import time
 import socket
 from pymongo import MongoClient
-import threading
 
 MONGO_URI = "mongodb+srv://donlike:123@cluster0.khggmzf.mongodb.net/?appName=Cluster0"
 DATABASE_NAME = "futbol"
@@ -19,7 +18,6 @@ tiempo_entre_verificaciones = 60
 
 
 def verificar_internet():
-    """Verifica si hay conexión a internet"""
     try:
         socket.create_connection(("8.8.8.8", 53), timeout=3)
         return True
@@ -28,7 +26,6 @@ def verificar_internet():
 
 
 def obtener_datos_json(nombre_archivo):
-    """Lee un archivo JSON"""
     try:
         with open(nombre_archivo, 'r', encoding='utf-8') as archivo:
             datos = json.load(archivo)
@@ -40,7 +37,6 @@ def obtener_datos_json(nombre_archivo):
 
 
 def guardar_datos_json(nombre_archivo, datos):
-    """Guarda datos en JSON"""
     try:
         with open(nombre_archivo, 'w', encoding='utf-8') as archivo:
             json.dump(datos, archivo, indent=4, ensure_ascii=False)
@@ -51,7 +47,6 @@ def guardar_datos_json(nombre_archivo, datos):
 
 
 def conectar_mongodb():
-    """Conecta a MongoDB y retorna la base de datos"""
     try:
         cliente = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
         cliente.admin.command('ping')
@@ -64,11 +59,10 @@ def conectar_mongodb():
 
 def sincronizar_archivo(archivo, coleccion_nombre, base_datos):
     print(f"  Procesando: {archivo}")
-    
     datos = obtener_datos_json(archivo)
     
     if not datos:
-        print(f"    -> Archivo vacío, se omite")
+        print(f"Archivo vacío, se omite")
         return False
     
     if isinstance(datos, dict):
@@ -80,7 +74,7 @@ def sincronizar_archivo(archivo, coleccion_nombre, base_datos):
         
         resultado = coleccion.insert_many(datos)
         cantidad = len(resultado.inserted_ids)
-        print(f"    ✔️ {cantidad} documentos guardados en MongoDB")
+        print(f"{cantidad} documentos guardados en MongoDB")
         
         
         return True
@@ -92,9 +86,7 @@ def sincronizar_archivo(archivo, coleccion_nombre, base_datos):
 
 
 def sincronizar_todos_archivos():
-    """Sincroniza todos los archivos con MongoDB"""
     print(f"\n[{time.strftime('%H:%M:%S')}] Iniciando sincronización...")
-    
     cliente, base_datos = conectar_mongodb()
     if not cliente:
         print("No se pudo conectar a MongoDB\n")
@@ -110,15 +102,8 @@ def sincronizar_todos_archivos():
 
 
 def monitorear_internet():
-    """
-    Monitorea la conexión a internet
-    Si detecta internet -> sincroniza
-    Si no hay internet -> espera sin hacer nada
-    """
-    global internet_disponible, ultima_verificacion
-    
+    global internet_disponible, ultima_verificacion 
     print("Sistema iniciado. Esperando conexión a internet...\n")
-    
     while True:
         tiempo_actual = time.time()
         
@@ -136,7 +121,6 @@ def monitorear_internet():
                 print(f"[{time.strftime('%H:%M:%S')}] SIN CONEXIÓN - Los datos se guardan localmente")
             
             elif hay_internet and internet_disponible:
-                print(f"[{time.strftime('%H:%M:%S')}] Sistema funcionando normalmente")
                 sincronizar_todos_archivos()
         
         time.sleep(5)

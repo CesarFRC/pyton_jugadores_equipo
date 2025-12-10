@@ -3,7 +3,7 @@ from sicronizador import iniciar_sincronizador
 
 class JugadoresMenu:
     
-   
+
     def __init__(self, jugadores_iniciales=None):
         
         if jugadores_iniciales is not None:
