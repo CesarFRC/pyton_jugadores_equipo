@@ -1,7 +1,7 @@
 from jugadores import jugador
 from sicronizador import iniciar_sincronizador
 from gestor_pendientes import registrar_pendiente 
-from bson import ObjectId  # <--- IMPORTANTE: Generador de IDs únicos
+from bson import ObjectId 
 
 class JugadoresMenu:
     
@@ -36,13 +36,9 @@ class JugadoresMenu:
             numero_de_camiseta = int(input("Número de camiseta: "))
             
             nuevo_jugador = jugador(nombre, edad, posicion, nacionalidad, numero_de_camiseta)
-            
-            # --- LOGICA OBJECTID ---
-            # Si el jugador es nuevo, le creamos su ID de Mongo aquí mismo.
-            # Lo convertimos a string (texto) para que se guarde bien en el JSON local.
+
             if not hasattr(nuevo_jugador, '_id'):
                 nuevo_jugador._id = str(ObjectId()) 
-            # -----------------------
             
             return nuevo_jugador
         except ValueError:
@@ -61,7 +57,6 @@ class JugadoresMenu:
             self.jugadores.guardar_json(self.archivo)
             print("Jugador agregado exitosamente y guardado")
 
-            # Al registrar el pendiente, vars(nuevo) ya incluye el '_id'
             registrar_pendiente("jugadores", "insertar", vars(nuevo)) 
 
     def ver(self):
@@ -70,7 +65,6 @@ class JugadoresMenu:
             print("No hay jugadores registrados")
             return
         for i, j in enumerate(self.jugadores.read()):
-            # Imprimimos también el ID oculto para confirmar que funciona
             id_mongo = getattr(j, '_id', 'Sin ID')
             print(f"{i}. {j} [ID Mongo: {id_mongo}]")
 
@@ -85,14 +79,11 @@ class JugadoresMenu:
             indice = int(input("\nÍndice del jugador a actualizar: "))
             
             viejo = self.jugadores.read()[indice]
-            
-            # --- RESCATAR ID ---
-            # Buscamos _id primero. Si es un dato viejo, intentamos buscar 'id' o 'camiseta'
+
             id_original = getattr(viejo, '_id', getattr(viejo, 'id', getattr(viejo, 'numero_de_camiseta', None)))
             
             nuevo = self.pedir_datos_jugador()
             if nuevo:
-                # Pegamos el ID original al objeto nuevo
                 if id_original: 
                     nuevo._id = id_original 
 
@@ -110,13 +101,11 @@ class JugadoresMenu:
             print("Error: Índice inválido")
 
     def eliminar(self):
-        # ... reutilizamos ver() ...
         self.ver() 
         try:
             indice = int(input("\nÍndice del jugador a eliminar: "))
             
             obj_borrar = self.jugadores.read()[indice]
-            # Capturamos el ID para decirle a Mongo cuál borrar
             id_borrar = getattr(obj_borrar, '_id', getattr(obj_borrar, 'id', None))
             
             self.jugadores.delete(indice)
@@ -128,7 +117,6 @@ class JugadoresMenu:
             print("Jugador eliminado exitosamente")
 
             if id_borrar:
-                # Enviamos solo el ID
                 registrar_pendiente("jugadores", "eliminar", {"_id": id_borrar})
 
         except (ValueError, IndexError):

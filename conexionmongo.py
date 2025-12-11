@@ -1,7 +1,7 @@
 import time
 import socket
 from pymongo import MongoClient
-from bson import ObjectId # <--- CRUCIAL: Para convertir texto a ID real
+from bson import ObjectId 
 from gestor_pendientes import obtener_pendientes, limpiar_pendientes 
 
 MONGO_URI = "mongodb+srv://donlike:123@cluster0.khggmzf.mongodb.net/?appName=Cluster0"
@@ -33,24 +33,16 @@ def procesar_cola_pendientes(base_datos):
         datos = cambio["datos"]
 
         try:
-            # === CONVERTIR TEXTO A OBJECTID DE MONGO ===
             oid = None
             
-            # Caso 1: Viene dentro de los datos (insertar/actualizar)
             if isinstance(datos, dict) and "_id" in datos:
-                # Convertimos el string "65a..." a ObjectId real
                 datos["_id"] = ObjectId(datos["_id"])
                 oid = datos["_id"]
             
-            # Caso 2: Compatibilidad vieja (si usabas 'id' normal)
             elif isinstance(datos, dict) and "id" in datos:
                 oid = datos["id"]
-            # ============================================
 
             if accion == "insertar":
-                # Usamos replace_one con upsert=True.
-                # Esto significa: "Busca este _id. Si existe, actualízalo. Si no, créalo."
-                # Es a prueba de fallos si se subió dos veces.
                 if oid:
                     coleccion.replace_one({"_id": oid}, datos, upsert=True)
                     print(f" -> Sincronizado: {oid}")
@@ -63,14 +55,12 @@ def procesar_cola_pendientes(base_datos):
                     print(f" -> Actualizado ID: {oid}")
 
             elif accion == "eliminar":
-                # En eliminar, 'datos' suele ser {"_id": "..."}
                 id_eliminar_str = datos.get("_id") or datos.get("id")
                 if id_eliminar_str:
-                    # Convertimos a ObjectId para poder borrarlo en la nube
                     try:
                         id_mongo = ObjectId(id_eliminar_str)
                     except:
-                        id_mongo = id_eliminar_str # Si era un ID viejo (número)
+                        id_mongo = id_eliminar_str
 
                     coleccion.delete_one({"_id": id_mongo})
                     print(f" -> Eliminado ID: {id_mongo}")

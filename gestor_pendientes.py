@@ -4,11 +4,6 @@ import os
 ARCHIVO_PENDIENTES = "cambios_pendientes.json"
 
 def registrar_pendiente(coleccion, accion, datos):
-    """
-    coleccion: "jugadores", "equipos", etc.
-    accion: "insertar", "actualizar", "eliminar"
-    datos: El diccionario del objeto o el ID (para eliminar)
-    """
     entrada = {
         "coleccion": coleccion,
         "accion": accion,
@@ -17,7 +12,6 @@ def registrar_pendiente(coleccion, accion, datos):
 
     lista_pendientes = []
     
-    # 1. Leemos lo que ya hay (si existe el archivo)
     if os.path.exists(ARCHIVO_PENDIENTES):
         try:
             with open(ARCHIVO_PENDIENTES, 'r', encoding='utf-8') as f:
@@ -25,10 +19,8 @@ def registrar_pendiente(coleccion, accion, datos):
         except:
             lista_pendientes = []
 
-    # 2. Agregamos el nuevo cambio
     lista_pendientes.append(entrada)
 
-    # 3. Guardamos
     with open(ARCHIVO_PENDIENTES, 'w', encoding='utf-8') as f:
         json.dump(lista_pendientes, f, indent=4, ensure_ascii=False)
     

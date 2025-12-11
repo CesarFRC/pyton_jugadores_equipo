@@ -5,7 +5,6 @@ from jugadores import jugador
 from equipo import equipo
 from sicronizador import iniciar_sincronizador
 from gestor_pendientes import registrar_pendiente
-# --- AGREGADO: Importar ObjectId ---
 from bson import ObjectId
 
 class EquipoJugadoresMenu:
@@ -26,21 +25,17 @@ class EquipoJugadoresMenu:
         self._jugadores_menu = None
         self._equipos_menu = None
 
-    # --- FUNCIÓN DE LIMPIEZA ACTUALIZADA ---
     def _serializar(self, entidad):
-        # Busamos el _id de Mongo. Si es un registro viejo, usamos id o nombre.
         id_obj = getattr(entidad, "_id", getattr(entidad, "id", getattr(entidad.equipo, "nombre", None)))
         
-        # Si por alguna razón extrema no tiene ID, generamos uno nuevo
         if not id_obj:
             id_obj = str(ObjectId())
 
         return {
-            "_id": id_obj, # Importante: Enviarlo como _id
+            "_id": id_obj,
             "equipo": vars(entidad.equipo), 
             "jugadores": [vars(j) for j in entidad.jugadores]
         }
-    # ---------------------------------------
                 
     def jugadores_menu(self):
         if self._jugadores_menu is None:
@@ -64,7 +59,6 @@ class EquipoJugadoresMenu:
     def agregar(self):
         equipo_menu_temp = EquipoMenu(equipo())
         nuevo_equipo = equipo_menu_temp.pedir_datos_equipo()
-        # Si nuevo_equipo es None (usuario canceló o error), salimos
         if not nuevo_equipo: 
             return
 
@@ -77,10 +71,8 @@ class EquipoJugadoresMenu:
         
         nueva_entidad = equipo_jugadores(nuevo_equipo, jugadores_list)
         
-        # --- AGREGADO: Generar ID de Mongo ---
         if not hasattr(nueva_entidad, '_id'):
             nueva_entidad._id = str(ObjectId())
-        # -------------------------------------
 
         self.lista.create(nueva_entidad)
         
@@ -89,7 +81,6 @@ class EquipoJugadoresMenu:
             print("Equipo completo agregado y guardado")
 
             try:
-                # Usamos _serializar para preparar los datos complejos
                 datos_limpios = self._serializar(nueva_entidad)
                 registrar_pendiente("equipos_jugadores", "insertar", datos_limpios)
             except Exception as e:
@@ -116,9 +107,7 @@ class EquipoJugadoresMenu:
             indice = int(input("Índice del equipo completo a actualizar: "))
             entidad_a_modificar = equipos[indice]
             
-            # --- CAPTURAR ID ORIGINAL ---
             id_original = getattr(entidad_a_modificar, "_id", getattr(entidad_a_modificar, "id", getattr(entidad_a_modificar.equipo, "nombre", None)))
-            # ----------------------------
 
             equipo_crud = equipo()
             equipo_crud.create(entidad_a_modificar.equipo)
@@ -132,12 +121,10 @@ class EquipoJugadoresMenu:
             
             nueva_entidad = equipo_jugadores(equipo_modificado, jugadores_modificados_list)
             
-            # --- RESTAURAR ID ---
             if id_original: 
                 nueva_entidad._id = id_original
             else:
-                nueva_entidad._id = str(ObjectId()) # Por si acaso
-            # --------------------
+                nueva_entidad._id = str(ObjectId())
 
             self.lista.update(indice, nueva_entidad)
             
@@ -160,10 +147,8 @@ class EquipoJugadoresMenu:
         try:
             indice = int(input("Índice del equipo completo a eliminar: "))
             
-            # --- CAPTURAR ID PARA ELIMINAR ---
             entidad_borrar = self.lista.read()[indice]
             id_borrar = getattr(entidad_borrar, "_id", getattr(entidad_borrar, "id", getattr(entidad_borrar.equipo, "nombre", None)))
-            # ---------------------------------
 
             self.lista.delete(indice)
             
