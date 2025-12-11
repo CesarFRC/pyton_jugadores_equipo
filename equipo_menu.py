@@ -1,7 +1,8 @@
 from equipo import equipo
 from sicronizador import iniciar_sincronizador
-# --- AGREGADO 1: Importamos el gestor ---
 from gestor_pendientes import registrar_pendiente
+# --- AGREGADO: Importamos ObjectId para generar IDs únicos ---
+from bson import ObjectId 
 
 class EquipoMenu:
     def __init__(self, equipos_iniciales=None):
@@ -36,11 +37,11 @@ class EquipoMenu:
             
             nuevo_equipo = equipo(nombre, entrenador, estadio, pais, año_fundacion)
             
-            # --- AGREGADO 2: Asegurar ID para la nube ---
-            # Si el equipo no tiene 'id', usamos el nombre como identificador único
-            if not hasattr(nuevo_equipo, 'id'):
-                nuevo_equipo.id = nombre
-            # --------------------------------------------
+            # --- CAMBIO CLAVE: Generar ID de Mongo localmente ---
+            # Si no tiene _id, generamos uno nuevo y lo convertimos a texto
+            if not hasattr(nuevo_equipo, '_id'):
+                nuevo_equipo._id = str(ObjectId())
+            # ----------------------------------------------------
 
             return nuevo_equipo
         except ValueError:
@@ -53,15 +54,14 @@ class EquipoMenu:
         if nuevo:
             self.equipos.create(nuevo)
             if not self.debe_guardar:
-                print("No se guardara lo agregado  ")
+                print("No se guardara lo agregado")
                 return
             
             self.equipos.guardar_json(self.archivo)
             print("Equipo agregado y guardado")
 
-            # --- AGREGADO 3: Registrar inserción ---
+            # Registramos el pendiente (nuevo ya trae su _id)
             registrar_pendiente("equipos", "insertar", vars(nuevo))
-            # ---------------------------------------
 
     def ver(self):
         print("\n-- LISTA DE EQUIPOS --")
@@ -69,28 +69,32 @@ class EquipoMenu:
             print("No hay equipos registrados")
             return
         for i, e in enumerate(self.equipos.read()):
-            print(f"{i}. {e}")
+            # Mostramos el ID para confirmar
+            id_str = getattr(e, '_id', 'Sin ID')
+            print(f"{i}. {e} [ID: {id_str}]")
 
     def actualizar(self):
         if getattr(self.equipos, "es_lista", True) and not self.equipos.read():
             print("\nNo hay equipos para actualizar")
             return
-        print("\n-- ACTUALIZAR EQUIPO --")
-        for i, e in enumerate(self.equipos.read()):
-            print(f"{i}. {e}")
+        
+        # Reutilizamos ver() para mostrar la lista
+        self.ver()
+        
         try:
             indice = int(input("\nÍndice del equipo a actualizar: "))
             
-            # --- AGREGADO 4: Capturar ID original ---
+            # --- RESCATAR ID ORIGINAL ---
             viejo = self.equipos.read()[indice]
-            # Intentamos obtener 'id', si no existe, usamos 'nombre'
-            id_original = getattr(viejo, 'id', getattr(viejo, 'nombre', None))
-            # ----------------------------------------
+            # Prioridad: _id > id > nombre
+            id_original = getattr(viejo, '_id', getattr(viejo, 'id', getattr(viejo, 'nombre', None)))
+            # ----------------------------
 
             nuevo = self.pedir_datos_equipo()
             if nuevo:
-                # Mantenemos el ID para no perder el rastro en la nube
-                if id_original: nuevo.id = id_original
+                # Pegamos el ID original al nuevo objeto
+                if id_original: 
+                    nuevo._id = id_original
 
                 self.equipos.update(indice, nuevo)
                 if not self.debe_guardar:
@@ -100,9 +104,7 @@ class EquipoMenu:
                 self.equipos.guardar_json(self.archivo)
                 print("Equipo actualizado y guardado")
 
-                # --- AGREGADO 5: Registrar actualización ---
                 registrar_pendiente("equipos", "actualizar", vars(nuevo))
-                # -------------------------------------------
 
         except ValueError:
             print("Error: Índice inválido")
@@ -111,16 +113,16 @@ class EquipoMenu:
         if getattr(self.equipos, "es_lista", True) and not self.equipos.read():
             print("\nNo hay equipos para eliminar")
             return
-        print("\n-- ELIMINAR EQUIPO --")
-        for i, e in enumerate(self.equipos.read()):
-            print(f"{i}. {e}")
+        
+        self.ver()
+        
         try:
             indice = int(input("\nÍndice del equipo a eliminar: "))
             
-            # --- AGREGADO 6: Capturar ID antes de borrar ---
+            # --- CAPTURAR ID PARA BORRAR EN NUBE ---
             obj_borrar = self.equipos.read()[indice]
-            id_borrar = getattr(obj_borrar, 'id', getattr(obj_borrar, 'nombre', None))
-            # -----------------------------------------------
+            id_borrar = getattr(obj_borrar, '_id', getattr(obj_borrar, 'id', getattr(obj_borrar, 'nombre', None)))
+            # ---------------------------------------
 
             self.equipos.delete(indice)
             if not self.debe_guardar:
@@ -130,10 +132,9 @@ class EquipoMenu:
             self.equipos.guardar_json(self.archivo)
             print("Equipo eliminado y guardado")
 
-            # --- AGREGADO 7: Registrar eliminación ---
             if id_borrar:
-                registrar_pendiente("equipos", "eliminar", {"id": id_borrar})
-            # -----------------------------------------
+                # Enviamos el ID a la cola de pendientes
+                registrar_pendiente("equipos", "eliminar", {"_id": id_borrar})
 
         except ValueError:
             print("Error: Índice inválido")

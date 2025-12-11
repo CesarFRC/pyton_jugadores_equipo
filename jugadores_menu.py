@@ -1,7 +1,7 @@
 from jugadores import jugador
 from sicronizador import iniciar_sincronizador
-# --- AGREGADO 1: Importamos la función para avisar al sincronizador ---
 from gestor_pendientes import registrar_pendiente 
+from bson import ObjectId  # <--- IMPORTANTE: Generador de IDs únicos
 
 class JugadoresMenu:
     
@@ -37,11 +37,12 @@ class JugadoresMenu:
             
             nuevo_jugador = jugador(nombre, edad, posicion, nacionalidad, numero_de_camiseta)
             
-            # --- AGREGADO 2: Asegurar un ID para la nube ---
-            # Si tu clase jugador no tiene .id, usamos la camiseta como identificador
-            if not hasattr(nuevo_jugador, 'id'):
-                nuevo_jugador.id = numero_de_camiseta
-            # -----------------------------------------------
+            # --- LOGICA OBJECTID ---
+            # Si el jugador es nuevo, le creamos su ID de Mongo aquí mismo.
+            # Lo convertimos a string (texto) para que se guarde bien en el JSON local.
+            if not hasattr(nuevo_jugador, '_id'):
+                nuevo_jugador._id = str(ObjectId()) 
+            # -----------------------
             
             return nuevo_jugador
         except ValueError:
@@ -60,10 +61,8 @@ class JugadoresMenu:
             self.jugadores.guardar_json(self.archivo)
             print("Jugador agregado exitosamente y guardado")
 
-            # --- AGREGADO 3: Avisar al sincronizador ---
-            # vars(nuevo) convierte el objeto en diccionario para guardarlo
+            # Al registrar el pendiente, vars(nuevo) ya incluye el '_id'
             registrar_pendiente("jugadores", "insertar", vars(nuevo)) 
-            # -------------------------------------------
 
     def ver(self):
         print("\n-- LISTA DE JUGADORES --")
@@ -71,7 +70,9 @@ class JugadoresMenu:
             print("No hay jugadores registrados")
             return
         for i, j in enumerate(self.jugadores.read()):
-            print(f"{i}. {j}")
+            # Imprimimos también el ID oculto para confirmar que funciona
+            id_mongo = getattr(j, '_id', 'Sin ID')
+            print(f"{i}. {j} [ID Mongo: {id_mongo}]")
 
     def actualizar(self):
         if getattr(self.jugadores, "es_lista", True) and not self.jugadores.read():
@@ -83,16 +84,17 @@ class JugadoresMenu:
         try:
             indice = int(input("\nÍndice del jugador a actualizar: "))
             
-            # --- AGREGADO 4A: Rescatar ID original antes de cambiar datos ---
             viejo = self.jugadores.read()[indice]
-            id_original = getattr(viejo, 'id', getattr(viejo, 'numero_de_camiseta', None))
-            # ---------------------------------------------------------------
-
+            
+            # --- RESCATAR ID ---
+            # Buscamos _id primero. Si es un dato viejo, intentamos buscar 'id' o 'camiseta'
+            id_original = getattr(viejo, '_id', getattr(viejo, 'id', getattr(viejo, 'numero_de_camiseta', None)))
+            
             nuevo = self.pedir_datos_jugador()
             if nuevo:
-                # --- AGREGADO 4B: Mantener el ID para que Mongo sepa a cual cambiar ---
-                if id_original: nuevo.id = id_original
-                # ----------------------------------------------------------------------
+                # Pegamos el ID original al objeto nuevo
+                if id_original: 
+                    nuevo._id = id_original 
 
                 self.jugadores.update(indice, nuevo)
                 if not self.debe_guardar:
@@ -102,28 +104,21 @@ class JugadoresMenu:
                 self.jugadores.guardar_json(self.archivo)
                 print("Jugador actualizado exitosamente")
 
-                # --- AGREGADO 5: Avisar al sincronizador ---
                 registrar_pendiente("jugadores", "actualizar", vars(nuevo))
-                # -------------------------------------------
 
         except ValueError:
             print("Error: Índice inválido")
 
     def eliminar(self):
-        if getattr(self.jugadores, "es_lista", True) and not self.jugadores.read():
-            print("\nNo hay jugadores para eliminar")
-            return
-        print("\n-- ELIMINAR JUGADOR --")
-        for i, j in enumerate(self.jugadores.read()):
-            print(f"{i}. {j}")
+        # ... reutilizamos ver() ...
+        self.ver() 
         try:
             indice = int(input("\nÍndice del jugador a eliminar: "))
             
-            # --- AGREGADO 6A: Capturar ID ANTES de borrar de la lista ---
             obj_borrar = self.jugadores.read()[indice]
-            id_borrar = getattr(obj_borrar, 'id', getattr(obj_borrar, 'numero_de_camiseta', None))
-            # ------------------------------------------------------------
-
+            # Capturamos el ID para decirle a Mongo cuál borrar
+            id_borrar = getattr(obj_borrar, '_id', getattr(obj_borrar, 'id', None))
+            
             self.jugadores.delete(indice)
             if not self.debe_guardar:
                 print("No se guardara ")
@@ -132,33 +127,22 @@ class JugadoresMenu:
             self.jugadores.guardar_json(self.archivo)
             print("Jugador eliminado exitosamente")
 
-            # --- AGREGADO 6B: Avisar al sincronizador ---
             if id_borrar:
-                registrar_pendiente("jugadores", "eliminar", {"id": id_borrar})
-            # --------------------------------------------
+                # Enviamos solo el ID
+                registrar_pendiente("jugadores", "eliminar", {"_id": id_borrar})
 
-        except ValueError:
+        except (ValueError, IndexError):
             print("Error: Índice inválido")
-        except IndexError:
-            print("Error: Índice fuera de rango") # Agregué esto por seguridad
 
     def run(self):
         while True:
             opcion = self.mostrar_menu()
-            if opcion == "1":
-                self.agregar()
-            elif opcion == "2":
-                self.ver()
-            elif opcion == "3":
-                self.actualizar()
-            elif opcion == "4":
-                self.eliminar()
-            elif opcion == "0":
-                print("\nSaliendo del programa...")
-                break
-            else:
-                print("\nOpción no válida, intente de nuevo")
-
+            if opcion == "1": self.agregar()
+            elif opcion == "2": self.ver()
+            elif opcion == "3": self.actualizar()
+            elif opcion == "4": self.eliminar()
+            elif opcion == "0": break
+            else: print("\nOpción no válida")
 
 if __name__ == "__main__":
     iniciar_sincronizador()
