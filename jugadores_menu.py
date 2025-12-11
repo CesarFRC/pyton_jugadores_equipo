@@ -57,7 +57,11 @@ class JugadoresMenu:
             self.jugadores.guardar_json(self.archivo)
             print("Jugador agregado exitosamente y guardado")
 
-            registrar_pendiente("jugadores", "insertar", vars(nuevo)) 
+            datos_limpios = vars(nuevo).copy()
+            if "es_lista" in datos_limpios:
+                del datos_limpios["es_lista"]
+
+            registrar_pendiente("jugadores", "insertar", datos_limpios) 
 
     def ver(self):
         print("\n-- LISTA DE JUGADORES --")
@@ -95,7 +99,11 @@ class JugadoresMenu:
                 self.jugadores.guardar_json(self.archivo)
                 print("Jugador actualizado exitosamente")
 
-                registrar_pendiente("jugadores", "actualizar", vars(nuevo))
+                datos_limpios = vars(nuevo).copy()
+                if "es_lista" in datos_limpios:
+                    del datos_limpios["es_lista"]
+
+                registrar_pendiente("jugadores", "actualizar", datos_limpios)
 
         except ValueError:
             print("Error: Índice inválido")

@@ -31,10 +31,21 @@ class EquipoJugadoresMenu:
         if not id_obj:
             id_obj = str(ObjectId())
 
+        dict_equipo = vars(entidad.equipo).copy()
+        if "es_lista" in dict_equipo:
+            del dict_equipo["es_lista"]
+
+        lista_jugadores_limpia = []
+        for j in entidad.jugadores:
+            d_jugador = vars(j).copy()
+            if "es_lista" in d_jugador:
+                del d_jugador["es_lista"]
+            lista_jugadores_limpia.append(d_jugador)
+
         return {
             "_id": id_obj,
-            "equipo": vars(entidad.equipo), 
-            "jugadores": [vars(j) for j in entidad.jugadores]
+            "equipo": dict_equipo, 
+            "jugadores": lista_jugadores_limpia
         }
                 
     def jugadores_menu(self):
