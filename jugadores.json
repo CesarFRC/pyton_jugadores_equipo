@@ -1,0 +1,16 @@
+[
+    {
+        "nombre": "gtf",
+        "edad": 20,
+        "posicion": "defensa",
+        "nacionalidad": "mexico",
+        "numero_de_camiseta": 1
+    },
+    {
+        "nombre": "lucas",
+        "edad": 22,
+        "posicion": "defensa",
+        "nacionalidad": "peruano",
+        "numero_de_camiseta": 3
+    }
+]
